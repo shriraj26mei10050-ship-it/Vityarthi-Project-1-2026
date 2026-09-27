@@ -31,7 +31,7 @@ def display_menu():
             for t in all_tickets:
                 print("ID: " + str(t["id"]) + " | Room: " + t["room"] + " | Problem: " + t["issue"] + " | Status: " + t["status"])
                 
-        elif choice_four := user_choice == "4":
+        elif user_choice == "4":
             room_no = input("Enter room number: ")
             problem = input("Enter problem details: ")
             result = tickets.create_ticket(room_no, problem)
@@ -51,9 +51,9 @@ def display_menu():
             
         elif user_choice == "7":
             active_passes = gatepass.get_outside_report()
-            print("--- Approved Outpasses ---")
+            print("\n--- Current Hostel Outpasses ---")
             for p in active_passes:
-                print("Pass ID: " + str(p["pass_id"]) + " | Name: " + p["student"] + " | Going To: " + p["destination"])
+                print("Pass ID: " + str(p["pass_id"]) + " | Name: " + p["student"] + " | Destination: " + p["destination"] + " | Status: " + p["status"])
                 
         elif user_choice == "8":
             print("Closing the system.")

@@ -15,9 +15,4 @@ def request_outpass(student_name, destination):
     return {"status": "success", "message": "Outpass requested successfully"}
 
 def get_outside_report():
-    approved_list = []
-    for current_pass in outpass_db:
-        if current_pass["status"] == "Approved":
-            approved_list.append(current_pass)
-            
-    return approved_list
+    return outpass_db
