@@ -4,16 +4,16 @@ def get_all_rooms():
     return rooms_db
 
 def allocate_room(student_name, preferred_type):
-    if not student_name or not preferred_type:
-        return {"error": "Student name and room type are required"}, 400
+    if student_name == "" or preferred_type == "":
+        return {"status": "error", "message": "Fields cannot be empty"}
 
     for room in rooms_db:
         if room["type"].lower() == preferred_type.lower():
-            if len(room["occupied_by"]) < room["capacity"]:
+            current_occupants = len(room["occupied_by"])
+            max_capacity = room["capacity"]
+            
+            if current_occupants < max_capacity:
                 room["occupied_by"].append(student_name)
-                return {
-                    "message": f"Success! {student_name} allocated to Room {room['room_number']}",
-                    "room_details": room
-                }, 201
+                return {"status": "success", "message": "Room allocated successfully"}
 
-    return {"error": f"No vacant {preferred_type} rooms available right now"}, 404
+    return {"status": "error", "message": "No available rooms found"}

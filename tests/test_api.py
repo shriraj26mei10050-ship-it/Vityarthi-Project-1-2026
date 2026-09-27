@@ -1,28 +1,18 @@
 import unittest
-import json
-from app import app
+from modules import allocation, tickets, gatepass
 
-class CampusLiveTestCase(unittest.TestCase):
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+class TestHostelSystem(unittest.TestCase):
+    def test_room_booking(self):
+        output = allocation.allocate_room("Rohan", "Non-AC")
+        self.assertEqual(output["status"], "success")
 
-    def test_home(self):
-        response = self.app.get('/')
-        data = json.loads(response.data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['status'], 'Online')
+    def test_complaint_logging(self):
+        output = tickets.create_ticket("201", "Light fuse")
+        self.assertEqual(output["status"], "success")
 
-    def test_get_rooms(self):
-        response = self.app.get('/api/rooms')
-        self.assertEqual(response.status_code, 200)
-
-    def test_allocate_room(self):
-        payload = {"student": "Amit Sharma", "type": "AC"}
-        response = self.app.post('/api/rooms/allocate', 
-                                 data=json.dumps(payload), 
-                                 content_type='application/json')
-        self.assertEqual(response.status_code, 201)
+    def test_gate_pass_request(self):
+        output = gatepass.request_outpass("Rohan", "Market")
+        self.assertEqual(output["status"], "success")
 
 if __name__ == '__main__':
     unittest.main()

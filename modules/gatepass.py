@@ -1,21 +1,23 @@
 from database.mock_db import outpass_db
 
 def request_outpass(student_name, destination):
-    if not student_name or not destination:
-        return {"error": "Invalid details"}, 400
+    if student_name == "" or destination == "":
+        return {"status": "error", "message": "Fields cannot be empty"}
         
+    next_pass_id = len(outpass_db) + 101
     new_pass = {
-        "pass_id": len(outpass_db) + 101,
+        "pass_id": next_pass_id,
         "student": student_name,
         "destination": destination,
         "status": "Pending Approval"
     }
     outpass_db.append(new_pass)
-    return {"message": "Out-pass requested", "data": new_pass}, 201
+    return {"status": "success", "message": "Outpass requested successfully"}
 
 def get_outside_report():
-    approved_leaves = [p for p in outpass_db if p["status"] == "Approved"]
-    return {
-        "total_outside": len(approved_leaves),
-        "student_list": approved_leaves
-    }
+    approved_list = []
+    for current_pass in outpass_db:
+        if current_pass["status"] == "Approved":
+            approved_list.append(current_pass)
+            
+    return approved_list

@@ -1,54 +1,66 @@
-from flask import Flask, jsonify, request
+import sys
 from modules import allocation, tickets, gatepass
 
-app = Flask(__name__)
-
-@app.route('/', methods=['GET'])
-def home():
-    return jsonify({"system": "CampusLive API", "status": "Online"}), 200
-
-@app.route('/api/rooms', methods=['GET'])
-def view_rooms():
-    return jsonify(allocation.get_all_rooms()), 200
-
-@app.route('/api/rooms/allocate', methods=['POST'])
-def book_room():
-    data = request.get_json() or {}
-    name = data.get('student')
-    room_type = data.get('type')
-    response, status_code = allocation.allocate_room(name, room_type)
-    return jsonify(response), status_code
-
-@app.route('/api/tickets', methods=['GET'])
-def view_tickets():
-    return jsonify(tickets.get_all_tickets()), 200
-
-@app.route('/api/tickets', methods=['POST'])
-def add_ticket():
-    data = request.get_json() or {}
-    room = data.get('room')
-    issue = data.get('issue')
-    response, status_code = tickets.create_ticket(room, issue)
-    return jsonify(response), status_code
-
-@app.route('/api/tickets/<int:id>', methods=['PUT'])
-def patch_ticket(id):
-    data = request.get_json() or {}
-    status = data.get('status', 'Resolved')
-    response, status_code = tickets.update_ticket_status(id, status)
-    return jsonify(response), status_code
-
-@app.route('/api/outpass/request', methods=['POST'])
-def file_pass():
-    data = request.get_json() or {}
-    name = data.get('student')
-    dest = data.get('destination')
-    response, status_code = gatepass.request_outpass(name, dest)
-    return jsonify(response), status_code
-
-@app.route('/api/outpass/report', methods=['GET'])
-def guard_report():
-    return jsonify(gatepass.get_outside_report()), 200
+def display_menu():
+    while True:
+        print("\n--- HOSTEL SYSTEM MENU ---")
+        print("1. View Rooms")
+        print("2. Book a Room")
+        print("3. View Complaints")
+        print("4. File a Complaint")
+        print("5. Update Complaint Status")
+        print("6. Request Gate Outpass")
+        print("7. View Gate Pass Report")
+        print("8. Exit")
+        
+        user_choice = input("Select an option (1-8): ")
+        
+        if user_choice == "1":
+            all_rooms = allocation.get_all_rooms()
+            for r in all_rooms:
+                print("Room Number: " + r["room_number"] + " | Type: " + r["type"] + " | Occupants: " + str(r["occupied_by"]))
+                
+        elif user_choice == "2":
+            s_name = input("Enter student name: ")
+            r_type = input("Enter room type (AC/Non-AC): ")
+            result = allocation.allocate_room(s_name, r_type)
+            print(result["message"])
+            
+        elif user_choice == "3":
+            all_tickets = tickets.get_all_tickets()
+            for t in all_tickets:
+                print("ID: " + str(t["id"]) + " | Room: " + t["room"] + " | Problem: " + t["issue"] + " | Status: " + t["status"])
+                
+        elif choice_four := user_choice == "4":
+            room_no = input("Enter room number: ")
+            problem = input("Enter problem details: ")
+            result = tickets.create_ticket(room_no, problem)
+            print(result["message"])
+            
+        elif user_choice == "5":
+            t_id = input("Enter ticket ID: ")
+            t_status = input("Enter new status: ")
+            result = tickets.update_ticket_status(t_id, t_status)
+            print(result["message"])
+            
+        elif user_choice == "6":
+            name = input("Enter your name: ")
+            place = input("Enter destination: ")
+            result = gatepass.request_outpass(name, place)
+            print(result["message"])
+            
+        elif user_choice == "7":
+            active_passes = gatepass.get_outside_report()
+            print("--- Approved Outpasses ---")
+            for p in active_passes:
+                print("Pass ID: " + str(p["pass_id"]) + " | Name: " + p["student"] + " | Going To: " + p["destination"])
+                
+        elif user_choice == "8":
+            print("Closing the system.")
+            sys.exit()
+            
+        else:
+            print("Invalid input. Try again.")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    display_menu()
